@@ -2,7 +2,6 @@ package com.example.eduvaultlms.config;
 
 import com.example.eduvaultlms.security.JwtAuthFilter;
 import com.example.eduvaultlms.security.UserDetailsServiceImpl;
-import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +39,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/courses/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(session ->
