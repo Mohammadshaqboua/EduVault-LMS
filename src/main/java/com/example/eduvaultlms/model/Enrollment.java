@@ -3,6 +3,8 @@ package com.example.eduvaultlms.model;
 import com.example.eduvaultlms.enums.EnrollmentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,5 +33,5 @@ public class Enrollment {
     private EnrollmentStatus status = EnrollmentStatus.ACTIVE;
 
     @Column(precision = 5, scale = 2)
-    private Float completionPct = 0.0f;
+    private BigDecimal completionPct = BigDecimal.ZERO;
 }
