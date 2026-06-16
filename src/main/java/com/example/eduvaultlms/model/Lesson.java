@@ -26,6 +26,6 @@ public class Lesson {
     private Integer orderIndex;
 
     @ManyToOne
-    @JoinColumn(name = "courseId" , nullable = false)
-    private Course courseId;
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 }

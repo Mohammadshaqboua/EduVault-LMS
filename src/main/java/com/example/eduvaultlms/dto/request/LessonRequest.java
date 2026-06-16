@@ -19,6 +19,6 @@ public class LessonRequest {
     @NotNull @Min(1)
     private Integer orderIndex;
 
-    @NotNull
-    private UUID courseId;
+//    @NotNull
+//    private UUID courseId;
 }
