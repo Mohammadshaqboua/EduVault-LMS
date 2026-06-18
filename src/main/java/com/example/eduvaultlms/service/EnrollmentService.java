@@ -10,6 +10,7 @@ import com.example.eduvaultlms.model.User;
 import com.example.eduvaultlms.repository.CourseRepository;
 import com.example.eduvaultlms.repository.EnrollmentRepository;
 import com.example.eduvaultlms.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +22,11 @@ import java.util.stream.Collectors;
 @Service
 public class EnrollmentService {
 
+    @Autowired
     private EnrollmentRepository enrollmentRepository;
+    @Autowired
     private CourseRepository courseRepository;
+    @Autowired
     private UserRepository userRepository;
 
     @Transactional
