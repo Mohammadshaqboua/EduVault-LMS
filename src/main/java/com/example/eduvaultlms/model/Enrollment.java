@@ -4,6 +4,7 @@ import com.example.eduvaultlms.enums.EnrollmentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import javax.net.ssl.SSLSession;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -34,4 +35,5 @@ public class Enrollment {
 
     @Column(precision = 5, scale = 2)
     private BigDecimal completionPct = BigDecimal.ZERO;
+
 }
