@@ -20,6 +20,7 @@ public class LessonController {
     private LessonService lessonService;
 
     @GetMapping("/api/courses/{courseId}/lessons")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<List<LessonResponse>> getLessonsByCourse(@PathVariable UUID courseId) {
         return ResponseEntity.ok(lessonService.getLessonsByCourse(courseId));
     }

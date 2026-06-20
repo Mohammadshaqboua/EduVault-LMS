@@ -3,6 +3,7 @@ package com.example.eduvaultlms.controller;
 import com.example.eduvaultlms.dto.response.CourseProgressResponse;
 import com.example.eduvaultlms.dto.response.LessonProgressResponse;
 import com.example.eduvaultlms.service.ProgressService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/progress")
 public class ProgressController {
+
+    @Autowired
     private ProgressService progressService;
 
     @PostMapping("/lessons/{id}/complete")

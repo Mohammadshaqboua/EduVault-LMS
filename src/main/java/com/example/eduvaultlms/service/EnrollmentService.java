@@ -24,27 +24,28 @@ public class EnrollmentService {
 
     @Autowired
     private EnrollmentRepository enrollmentRepository;
+
     @Autowired
     private CourseRepository courseRepository;
+
     @Autowired
     private UserRepository userRepository;
 
     @Transactional
     public EnrollmentResponse enroll(UUID studentId, UUID courseId) {
-
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("The course is not available."));
 
         if (!course.getIsPublished()) {
-            throw new ResourceNotFoundException("The course is currently unavailable.ً");
-        }
-
-        if (enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId)) {
-            throw new AlreadyEnrolledException("You are already enrolled in this course");
+            throw new ResourceNotFoundException("The course is currently unavailable.");
         }
 
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (enrollmentRepository.existsByStudentIdAndCourseId(student, course)) {
+            throw new AlreadyEnrolledException("You are already enrolled in this course");
+        }
 
         Enrollment enrollment = new Enrollment();
         enrollment.setStudentId(student);
@@ -58,7 +59,10 @@ public class EnrollmentService {
 
     @Transactional(readOnly = true)
     public List<EnrollmentResponse> getMyEnrollments(UUID studentId) {
-        return enrollmentRepository.findByStudentId(studentId)
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return enrollmentRepository.findByStudentId(student)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -66,9 +70,14 @@ public class EnrollmentService {
 
     @Transactional
     public void unenroll(UUID studentId, UUID courseId) {
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("The course is not available."));
 
         Enrollment enrollment = enrollmentRepository
-                .findByStudentIdAndCourseId(studentId, courseId)
+                .findByStudentIdAndCourseId(student, course)
                 .orElseThrow(() -> new ResourceNotFoundException("You are not enrolled in this course"));
 
         enrollmentRepository.delete(enrollment);
@@ -76,12 +85,10 @@ public class EnrollmentService {
 
     @Transactional(readOnly = true)
     public List<EnrollmentResponse> getEnrollmentsByCourse(UUID courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("The course is not available."));
 
-        if (!courseRepository.existsById(courseId)) {
-            throw new ResourceNotFoundException("The course is not available.");
-        }
-
-        return enrollmentRepository.findByCourseId(courseId)
+        return enrollmentRepository.findByCourseId(course)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
