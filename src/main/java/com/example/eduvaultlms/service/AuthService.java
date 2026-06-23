@@ -19,6 +19,9 @@ public class AuthService {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private EmailService emailService;
+
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public MessageResponse register(RegisterRequest request) {
@@ -34,6 +37,8 @@ public class AuthService {
         user.setRole(Role.STUDENT);
 
         userRepo.save(user);
+
+        emailService.sendWelcomeEmail(user.getEmail(), user.getName());
 
         return new MessageResponse("User registered successfully");
     }
