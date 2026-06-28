@@ -4,27 +4,25 @@ import com.example.eduvaultlms.enums.EnrollmentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import javax.net.ssl.SSLSession;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "enrollments")
 public class Enrollment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "studentId", nullable = false)
-    private User studentId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
-    @ManyToOne
-    @JoinColumn(name = "courseId", nullable = false)
-    private Course courseId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
     @Column(updatable = false)
     private LocalDateTime enrolledAt = LocalDateTime.now();
@@ -35,5 +33,4 @@ public class Enrollment {
 
     @Column(precision = 5, scale = 2)
     private BigDecimal completionPct = BigDecimal.ZERO;
-
 }

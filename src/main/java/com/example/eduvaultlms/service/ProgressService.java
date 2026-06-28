@@ -31,12 +31,19 @@ public class ProgressService {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
 
+    @Autowired
+    private CertificateService certificateService;
+
     @Transactional
     public LessonProgressResponse completeLesson(UUID lessonId) {
         User currentUser = getCurrentUser();
 
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id: " + lessonId));
+
+        enrollmentRepository.findByStudentIdAndCourseId(currentUser, lesson.getCourse())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "You must be enrolled in this course before completing lessons"));
 
         Optional<LessonProgress> existing = lessonProgressRepo
                 .findByStudentIdAndLessonId(currentUser, lesson);
@@ -46,6 +53,7 @@ public class ProgressService {
         if (existing.isPresent()) {
             progress = existing.get();
             progress.setIsCompleted(true);
+            lessonProgressRepo.save(progress);
         } else {
             progress = new LessonProgress();
             progress.setStudentId(currentUser);
@@ -62,7 +70,6 @@ public class ProgressService {
     public CourseProgressResponse getCourseProgress(UUID courseId) {
         User currentUser = getCurrentUser();
 
-        // ✅ نمرر currentUser (object) بدل currentUser.getId()
         Enrollment enrollment = enrollmentRepository
                 .findByStudentIdAndCourseId(currentUser, getCourseRef(courseId))
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -90,12 +97,11 @@ public class ProgressService {
     public List<CourseProgressResponse> getMyProgress() {
         User currentUser = getCurrentUser();
 
-        // ✅ نمرر currentUser (object) بدل currentUser.getId()
         List<Enrollment> enrollments = enrollmentRepository
                 .findByStudentId(currentUser);
 
         return enrollments.stream().map(enrollment -> {
-            UUID courseId = enrollment.getCourseId().getId();
+            UUID courseId = enrollment.getCourse().getId();
 
             long totalLessons = lessonRepository.countByCourseId(courseId);
             long completedCount = lessonProgressRepo
@@ -117,7 +123,6 @@ public class ProgressService {
     }
 
     private void updateEnrollmentCompletion(User student, Course course) {
-        // ✅ نمرر student و course (objects) بدل .getId()
         enrollmentRepository.findByStudentIdAndCourseId(student, course)
                 .ifPresent(enrollment -> {
                     long total = lessonRepository.countByCourseId(course.getId());
@@ -133,9 +138,11 @@ public class ProgressService {
 
                     if (pct.compareTo(BigDecimal.valueOf(100)) >= 0) {
                         enrollment.setStatus(EnrollmentStatus.COMPLETED);
+                        enrollmentRepository.save(enrollment);
+                        certificateService.generateAndIssueCertificate(student, course);
+                    } else {
+                        enrollmentRepository.save(enrollment);
                     }
-
-                    enrollmentRepository.save(enrollment);
                 });
     }
 

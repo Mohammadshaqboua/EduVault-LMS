@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,8 +33,9 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseRequest request){
-        CourseResponse created = courseService.createCourse(request);
+    public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseRequest request,
+                                                       MultipartFile thumbnail){
+        CourseResponse created = courseService.createCourse(request, thumbnail);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

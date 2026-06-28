@@ -7,20 +7,21 @@ import com.example.eduvaultlms.model.Course;
 import com.example.eduvaultlms.model.Lesson;
 import com.example.eduvaultlms.repository.CourseRepository;
 import com.example.eduvaultlms.repository.LessonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class LessonService {
 
-    @Autowired
-    private LessonRepository lessonRepo;
-
-    @Autowired
-    private CourseRepository courseRepo;
+    private final LessonRepository  lessonRepo;
+    private final CourseRepository  courseRepo;
+    private final FileUploadService fileUploadService;
 
     public List<LessonResponse> getLessonsByCourse(UUID courseId) {
         return lessonRepo.findByCourseIdOrderByOrderIndexAsc(courseId)
@@ -29,9 +30,14 @@ public class LessonService {
                 .collect(Collectors.toList());
     }
 
-    public LessonResponse createLesson(UUID courseId, LessonRequest request) {
+    public LessonResponse createLesson(UUID courseId, LessonRequest request, MultipartFile video) {
         Course course = courseRepo.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+
+        if (video != null && !video.isEmpty()) {
+            String url = fileUploadService.uploadLessonVideo(video);
+            request.setVideoUrl(url);
+        }
 
         Lesson lesson = new Lesson();
         lesson.setTitle(request.getTitle());
@@ -41,13 +47,17 @@ public class LessonService {
         lesson.setOrderIndex(request.getOrderIndex());
         lesson.setCourse(course);
 
-        Lesson saved = lessonRepo.save(lesson);
-        return new LessonResponse(saved);
+        return new LessonResponse(lessonRepo.save(lesson));
     }
 
-    public LessonResponse updateLesson(UUID id, LessonRequest request) {
+    public LessonResponse updateLesson(UUID id, LessonRequest request, MultipartFile video) {
         Lesson lesson = lessonRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id: " + id));
+
+        if (video != null && !video.isEmpty()) {
+            String url = fileUploadService.uploadLessonVideo(video);
+            request.setVideoUrl(url);
+        }
 
         lesson.setTitle(request.getTitle());
         lesson.setVideoUrl(request.getVideoUrl());
@@ -55,17 +65,14 @@ public class LessonService {
         lesson.setDuration(request.getDuration());
         lesson.setOrderIndex(request.getOrderIndex());
 
-        Lesson updated = lessonRepo.save(lesson);
-        return new LessonResponse(updated);
+        return new LessonResponse(lessonRepo.save(lesson));
     }
 
     public LessonResponse reorderLesson(UUID id, int newOrderIndex) {
         Lesson lesson = lessonRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id: " + id));
-
         lesson.setOrderIndex(newOrderIndex);
-        Lesson updated = lessonRepo.save(lesson);
-        return new LessonResponse(updated);
+        return new LessonResponse(lessonRepo.save(lesson));
     }
 
     public void deleteLesson(UUID id) {

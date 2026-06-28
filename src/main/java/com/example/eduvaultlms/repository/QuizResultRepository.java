@@ -10,7 +10,9 @@ import java.util.UUID;
 
 @Repository
 public interface QuizResultRepository extends JpaRepository<QuizResult, UUID> {
-    List<QuizResult> findByStudentIdAndQuizId(UUID studentId, UUID quizId);
     int countByStudentIdAndQuizId(UUID studentId, UUID quizId);
-    Optional<QuizResult> findTopByStudentIdAndQuizIdOrderByScoreDesc(UUID studentId, UUID quizId);
+
+    List<QuizResult> findByStudentIdAndQuizIdOrderByAttemptNumberAsc(UUID studentId, UUID quizId);
+
+    List<QuizResult> findByQuizIdOrderByStudentIdAscAttemptNumberAsc(UUID quizId);
 }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,16 +30,18 @@ public class LessonController {
     @PostMapping("/api/courses/{courseId}/lessons")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LessonResponse> createLesson(@PathVariable UUID courseId,
-                                                       @Valid @RequestBody LessonRequest request) {
-        LessonResponse created = lessonService.createLesson(courseId, request);
+                                                       @Valid @RequestBody LessonRequest request ,
+                                                        MultipartFile video) {
+        LessonResponse created = lessonService.createLesson(courseId, request , video);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/api/lessons/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LessonResponse> updateLesson(@PathVariable UUID id,
-                                                       @Valid @RequestBody LessonRequest request) {
-        return ResponseEntity.ok(lessonService.updateLesson(id, request));
+                                                       @Valid @RequestBody LessonRequest request,
+                                                       MultipartFile video) {
+        return ResponseEntity.ok(lessonService.updateLesson(id, request, video));
     }
 
     @DeleteMapping("/api/lessons/{id}")

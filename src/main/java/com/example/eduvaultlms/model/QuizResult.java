@@ -2,35 +2,35 @@ package com.example.eduvaultlms.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "quiz_results")
 public class QuizResult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "studentId", nullable = false)
-    private User studentId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
-    @ManyToOne
-    @JoinColumn(name = "quizId", nullable = false)
-    private Quiz quizId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "quiz_id", nullable = false)
+    private Quiz quiz;
 
     @Column(nullable = false)
     private Integer score;
 
     @Column(nullable = false)
-    private Boolean isPassed = false;
+    private boolean isPassed;
 
     @Column(nullable = false)
-    private Integer attemptNumber = 1;
+    private Integer attemptNumber;
 
-    @Column(updatable = false)
-    private LocalDateTime takenAt = LocalDateTime.now();
+    @Column(nullable = false)
+    private LocalDateTime takenAt;
 }
