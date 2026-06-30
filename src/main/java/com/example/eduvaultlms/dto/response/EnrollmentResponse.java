@@ -15,14 +15,12 @@ import java.util.UUID;
 
 public class EnrollmentResponse {
 
-    private UUID enrollmentId;
-
-    private UUID courseId;
-    private String courseTitle;
-    private String courseThumbnailUrl;
-    private BigDecimal coursePrice;
-
-    private LocalDateTime enrolledAt;
-    private EnrollmentStatus status;
-    private BigDecimal completionPct;
+    private UUID                enrollmentId;
+    private UUID                courseId;
+    private String              courseTitle;
+    private String              courseThumbnailUrl;
+    private BigDecimal          coursePrice;
+    private LocalDateTime       enrolledAt;
+    private EnrollmentStatus    status;
+    private BigDecimal          completionPct;
 }

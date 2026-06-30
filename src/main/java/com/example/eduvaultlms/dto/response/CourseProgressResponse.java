@@ -12,10 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseProgressResponse {
-    private UUID courseId;
-    private String courseTitle;
+    private UUID    courseId;
+    private String  courseTitle;
     private Integer completedLessons;
     private Integer totalLessons;
-    private Double completionPct;
-    private String enrollmentStatus;
+    private Double  completionPct;
+    private String  enrollmentStatus;
 }

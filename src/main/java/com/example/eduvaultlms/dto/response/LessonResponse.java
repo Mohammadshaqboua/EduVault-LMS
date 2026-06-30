@@ -7,13 +7,13 @@ import java.util.UUID;
 
 @Data
 public class LessonResponse {
-    private UUID id;
-    private String title;
-    private String videoUrl;
-    private String content;
+    private UUID    id;
+    private String  title;
+    private String  videoUrl;
+    private String  content;
     private Integer duration;
     private Integer orderIndex;
-    private UUID courseId;
+    private UUID    courseId;
 
     public LessonResponse(Lesson lesson) {
         this.id = lesson.getId();

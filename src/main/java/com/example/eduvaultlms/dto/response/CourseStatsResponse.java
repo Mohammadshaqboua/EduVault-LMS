@@ -13,11 +13,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CourseStatsResponse {
 
-    private UUID courseId;
+    private UUID    courseId;
     private String courseTitle;
-    private long totalEnrollments;
-    private double averageCompletionPct;
-    private long completedStudents;
-    private long totalLessons;
-    private long totalQuizzes;
+    private long    totalEnrollments;
+    private double  averageCompletionPct;
+    private long    completedStudents;
+    private long    totalLessons;
+    private long    totalQuizzes;
 }

@@ -13,9 +13,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LessonProgressResponse {
-    private UUID lessonId;
-    private String lessonTitle;
-    private Boolean isCompleted;
-    private LocalDateTime watchedAt;
-    private Integer watchedSeconds;
+    private UUID            lessonId;
+    private String          lessonTitle;
+    private Boolean         isCompleted;
+    private LocalDateTime   watchedAt;
+    private Integer         watchedSeconds;
 }

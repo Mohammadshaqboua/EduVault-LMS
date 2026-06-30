@@ -1,26 +1,25 @@
 package com.example.eduvaultlms.dto.response;
 
 import com.example.eduvaultlms.model.Course;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
 @Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CourseResponse {
 
-    private UUID id;
-    private String title;
-    private String description;
-    private String thumbnailUrl;
-    private BigDecimal price;
-    private Boolean isPublished;
-    private UUID createdById;
-
-    public CourseResponse() {
-    }
+    private UUID        id;
+    private String      title;
+    private String      description;
+    private String      thumbnailUrl;
+    private BigDecimal  price;
+    private Boolean     isPublished;
+    private UUID        createdById;
 
     public CourseResponse(Course course) {
         this.id = course.getId();

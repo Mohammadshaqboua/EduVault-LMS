@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AdminStatsResponse {
 
-    private long totalStudents;
-    private long totalCourses;
-    private long publishedCourses;
-    private long totalEnrollments;
-    private long totalCertificatesIssued;
-    private long totalQuizzes;
-    private double averageCompletionRate;
+    private long    totalStudents;
+    private long    totalCourses;
+    private long    publishedCourses;
+    private long    totalEnrollments;
+    private long    totalCertificatesIssued;
+    private long    totalQuizzes;
+    private double  averageCompletionRate;
 }

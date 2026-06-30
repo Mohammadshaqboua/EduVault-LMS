@@ -11,10 +11,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CertificateResponse {
-    private UUID id;
-    private String studentName;
-    private String courseTitle;
-    private String pdfUrl;
-    private String uniqueCode;
-    private LocalDateTime issuedAt;
+    private UUID            id;
+    private String          studentName;
+    private String          courseTitle;
+    private String          pdfUrl;
+    private String          uniqueCode;
+    private LocalDateTime   issuedAt;
 }
