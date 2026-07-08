@@ -26,9 +26,16 @@ public class FileUploadService {
     private static final long MAX_IMAGE_SIZE = 5L * 1024 * 1024;
     private static final long MAX_VIDEO_SIZE = 200L * 1024 * 1024;
 
+    public record UploadResult(String url, String publicId) {}
+
     public String uploadCourseThumbnail(MultipartFile file) {
         validateImage(file);
         return upload(file, "eduvault/thumbnails", "auto");
+    }
+
+    public UploadResult uploadCourseThumbnailWithId(MultipartFile file) {
+        validateImage(file);
+        return uploadWithId(file, "eduvault/thumbnails", "auto");
     }
 
     public String uploadLessonVideo(MultipartFile file) {
@@ -75,6 +82,24 @@ public class FileUploadService {
             );
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), options);
             return (String) result.get("secure_url");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload file, please try again");
+        }
+    }
+
+    private UploadResult uploadWithId(MultipartFile file, String folder, String resourceType) {
+        try {
+            String publicId = UUID.randomUUID().toString();
+            Map<String, Object> options = ObjectUtils.asMap(
+                    "folder",        folder,
+                    "resource_type", resourceType,
+                    "public_id",     publicId,
+                    "overwrite",     false
+            );
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), options);
+            String url = (String) result.get("secure_url");
+            String fullPublicId = (String) result.get("public_id");
+            return new UploadResult(url, fullPublicId);
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file, please try again");
         }

@@ -11,19 +11,9 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
-    List<Course> findByIsPublishedTrue();
-    List<Course> findByCreatedById(UUID userId);
     long countByIsPublishedTrue();
 
-    // Most-enrolled published course
-    @Query("""
-            SELECT c FROM Course c
-            JOIN Enrollment e ON e.id = c.id
-            WHERE c.isPublished = true
-            GROUP BY c.id
-            ORDER BY COUNT(e.id) DESC
-            LIMIT 1
-            """)
+    @Query("SELECT c FROM Course c JOIN Enrollment e ON e.course.id = c.id WHERE e.status = 'COMPLETED' GROUP BY c ORDER BY COUNT(e) DESC")
     Course findMostEnrolledCourse();
 
     @Query("SELECT COUNT(l) FROM Lesson l WHERE l.course.id = :courseId")

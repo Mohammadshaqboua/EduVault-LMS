@@ -14,10 +14,7 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User,UUID> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail (String email);
-    List<User> findAllByOrderByCreatedAtDesc();
-
+    List<User> findByRoleOrderByCreatedAtDesc(Role role);
     long countByRole(Role role);
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role AND u.isActive = true")
-    long countActiveByRole(Role role);
 }

@@ -5,9 +5,7 @@ import com.example.eduvaultlms.dto.response.LessonProgressResponse;
 import com.example.eduvaultlms.enums.EnrollmentStatus;
 import com.example.eduvaultlms.exception.ResourceNotFoundException;
 import com.example.eduvaultlms.model.*;
-import com.example.eduvaultlms.repository.EnrollmentRepository;
-import com.example.eduvaultlms.repository.LessonProgressRepository;
-import com.example.eduvaultlms.repository.LessonRepository;
+import com.example.eduvaultlms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +32,12 @@ public class ProgressService {
     @Autowired
     private CertificateService certificateService;
 
+    @Autowired
+    private QuizRepository quizRepo;
+
+    @Autowired
+    private QuizResultRepository quizResultRepo;
+
     @Transactional
     public LessonProgressResponse completeLesson(UUID lessonId) {
         User currentUser = getCurrentUser();
@@ -41,7 +45,7 @@ public class ProgressService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id: " + lessonId));
 
-        enrollmentRepository.findByStudentIdAndCourseId(currentUser, lesson.getCourse())
+        enrollmentRepository.findByStudentAndCourse(currentUser, lesson.getCourse())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "You must be enrolled in this course before completing lessons"));
 
@@ -64,14 +68,16 @@ public class ProgressService {
 
         updateEnrollmentCompletion(currentUser, lesson.getCourse());
 
-        return toResponse(progress);
+        boolean IsQuizzesCompleted = allQuizzesPassed(currentUser.getId(), lesson.getCourse().getId());
+
+        return toResponse(progress , IsQuizzesCompleted);
     }
 
     public CourseProgressResponse getCourseProgress(UUID courseId) {
         User currentUser = getCurrentUser();
 
         Enrollment enrollment = enrollmentRepository
-                .findByStudentIdAndCourseId(currentUser, getCourseRef(courseId))
+                .findByStudentAndCourse(currentUser, getCourseRef(courseId))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Enrollment not found for courseId: " + courseId));
 
@@ -87,6 +93,7 @@ public class ProgressService {
 
         return CourseProgressResponse.builder()
                 .courseId(courseId)
+                .courseTitle(enrollment.getCourse().getTitle())
                 .completedLessons((int) completedCount)
                 .totalLessons((int) totalLessons)
                 .completionPct(completionPct)
@@ -98,7 +105,8 @@ public class ProgressService {
         User currentUser = getCurrentUser();
 
         List<Enrollment> enrollments = enrollmentRepository
-                .findByStudentId(currentUser);
+                .findByStudent(currentUser);
+
 
         return enrollments.stream().map(enrollment -> {
             UUID courseId = enrollment.getCourse().getId();
@@ -114,6 +122,7 @@ public class ProgressService {
 
             return CourseProgressResponse.builder()
                     .courseId(courseId)
+                    .courseTitle(enrollment.getCourse().getTitle())
                     .completedLessons((int) completedCount)
                     .totalLessons((int) totalLessons)
                     .completionPct(completionPct)
@@ -122,21 +131,24 @@ public class ProgressService {
         }).collect(Collectors.toList());
     }
 
-    private void updateEnrollmentCompletion(User student, Course course) {
-        enrollmentRepository.findByStudentIdAndCourseId(student, course)
+    public void updateEnrollmentCompletion(User student, Course course) {
+        enrollmentRepository.findByStudentAndCourse(student, course)
                 .ifPresent(enrollment -> {
-                    long total = lessonRepository.countByCourseId(course.getId());
-                    long completed = lessonProgressRepo
+                    long totalLessons = lessonRepository.countByCourseId(course.getId());
+                    long completedLessons = lessonProgressRepo
                             .countByStudentIdAndLessonId_Course_IdAndIsCompletedTrue(
                                     student, course.getId());
 
-                    BigDecimal pct = total > 0
-                            ? BigDecimal.valueOf(completed * 100.0 / total)
+                    BigDecimal pct = totalLessons > 0
+                            ? BigDecimal.valueOf(completedLessons * 100.0 / totalLessons)
                             : BigDecimal.ZERO;
 
                     enrollment.setCompletionPct(pct);
 
-                    if (pct.compareTo(BigDecimal.valueOf(100)) >= 0) {
+                    boolean allLessonsDone  = pct.compareTo(BigDecimal.valueOf(100)) >= 0;
+                    boolean allQuizzesDone  = allQuizzesPassed(student.getId(), course.getId());
+
+                    if (allLessonsDone && allQuizzesDone) {
                         enrollment.setStatus(EnrollmentStatus.COMPLETED);
                         enrollmentRepository.save(enrollment);
                         certificateService.generateAndIssueCertificate(student, course);
@@ -158,11 +170,26 @@ public class ProgressService {
         return course;
     }
 
-    private LessonProgressResponse toResponse(LessonProgress progress) {
+    private boolean allQuizzesPassed(UUID studentId, UUID courseId) {
+        List<Quiz> quizzes = quizRepo.findByCourseId(courseId);
+
+        if (quizzes.isEmpty()) {
+            return true;
+        }
+
+        return quizzes.stream()
+                .allMatch(quiz -> quizResultRepo
+                        .findTopByStudentIdAndQuizIdOrderByAttemptNumberDesc(studentId, quiz.getId())
+                        .map(QuizResult::isPassed)
+                        .orElse(false));
+    }
+
+    private LessonProgressResponse toResponse(LessonProgress progress , boolean IsQuizzesCompleted) {
         return LessonProgressResponse.builder()
                 .lessonId(progress.getLessonId().getId())
                 .lessonTitle(progress.getLessonId().getTitle())
                 .isCompleted(progress.getIsCompleted())
+                .allQuizzesPassed(IsQuizzesCompleted)
                 .watchedAt(progress.getWatchedAt())
                 .watchedSeconds(progress.getWatchedSeconds())
                 .build();

@@ -29,7 +29,6 @@ public class QuestionRequest {
     @Min(value = 0, message = "correctIndex must be >= 0")
     private Integer correctIndex;
 
-    @NotNull(message = "points is required")
     @Min(value = 1, message = "points must be at least 1")
     private Integer points;
 }

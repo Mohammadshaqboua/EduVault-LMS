@@ -56,8 +56,15 @@ public class AdminService {
                 .build();
     }
 
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAllByOrderByCreatedAtDesc()
+    public List<UserResponse> getAllStudents() {
+        return userRepository.findByRoleOrderByCreatedAtDesc(Role.STUDENT)
+                .stream()
+                .map(this::toUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserResponse> getAllAdmins() {
+        return userRepository.findByRoleOrderByCreatedAtDesc(Role.ADMIN)
                 .stream()
                 .map(this::toUserResponse)
                 .collect(Collectors.toList());
@@ -73,37 +80,29 @@ public class AdminService {
     }
 
 
-    public CourseStatsResponse getCourseStats() {
-        Course topCourse = courseRepository.findMostEnrolledCourse();
+    public List<CourseStatsResponse> getCourseStats() {
+        List<Course> courses = courseRepository.findAll();
 
-        if (topCourse == null) {
-            return CourseStatsResponse.builder()
-                    .courseTitle("N/A — no enrollments yet")
-                    .totalEnrollments(0)
-                    .averageCompletionPct(0.0)
-                    .completedStudents(0)
-                    .totalLessons(0)
-                    .totalQuizzes(0)
-                    .build();
-        }
+        return courses.stream()
+                .map(course -> {
+                    UUID courseId = course.getId();
+                    long totalEnrollments  = enrollmentRepository.countByCourseId(courseId);
+                    Double avgPct          = enrollmentRepository.avgCompletionPctByCourseId(courseId);
+                    long completedStudents = enrollmentRepository.countCompletedStudentsByCourseId(courseId);
+                    long totalLessons      = courseRepository.countLessonsByCourseId(courseId);
+                    long totalQuizzes      = courseRepository.countQuizzesByCourseId(courseId);
 
-        UUID courseId = topCourse.getId();
-
-        long totalEnrollments  = enrollmentRepository.countByCourseId(courseId);
-        Double avgPct          = enrollmentRepository.avgCompletionPctByCourseId(courseId);
-        long completedStudents = enrollmentRepository.countCompletedStudentsByCourseId(courseId);
-        long totalLessons      = courseRepository.countLessonsByCourseId(courseId);
-        long totalQuizzes      = courseRepository.countQuizzesByCourseId(courseId);
-
-        return CourseStatsResponse.builder()
-                .courseId(courseId)
-                .courseTitle(topCourse.getTitle())
-                .totalEnrollments(totalEnrollments)
-                .averageCompletionPct(avgPct != null ? avgPct : 0.0)
-                .completedStudents(completedStudents)
-                .totalLessons(totalLessons)
-                .totalQuizzes(totalQuizzes)
-                .build();
+                    return CourseStatsResponse.builder()
+                            .courseId(courseId)
+                            .courseTitle(course.getTitle())
+                            .totalEnrollments(totalEnrollments)
+                            .averageCompletionPct(avgPct != null ? avgPct : 0.0)
+                            .completedStudents(completedStudents)
+                            .totalLessons(totalLessons)
+                            .totalQuizzes(totalQuizzes)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     private UserResponse toUserResponse(User user) {

@@ -8,15 +8,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizRequest {
-    @NotNull(message = "courseId is required")
-    private UUID courseId;
 
     @NotBlank(message = "title is required")
     @Size(max = 200, message = "title must not exceed 200 characters")
@@ -33,4 +30,5 @@ public class QuizRequest {
 
     @NotEmpty(message = "A quiz must have at least one question")
     @Valid
-    private List<QuestionRequest> questions;}
+    private List<QuestionRequest> questions;
+}

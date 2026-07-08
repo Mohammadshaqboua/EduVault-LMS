@@ -7,6 +7,7 @@ import com.example.eduvaultlms.dto.request.QuizSubmitRequest;
 import com.example.eduvaultlms.dto.response.QuestionResponse;
 import com.example.eduvaultlms.dto.response.QuizResponse;
 import com.example.eduvaultlms.dto.response.QuizResultResponse;
+import com.example.eduvaultlms.exception.DuplicateResourceException;
 import com.example.eduvaultlms.exception.ResourceNotFoundException;
 import com.example.eduvaultlms.exception.UnauthorizedException;
 import com.example.eduvaultlms.model.Course;
@@ -19,11 +20,12 @@ import com.example.eduvaultlms.repository.EnrollmentRepository;
 import com.example.eduvaultlms.repository.QuizRepository;
 import com.example.eduvaultlms.repository.QuizResultRepository;
 import com.example.eduvaultlms.repository.UserRepository;
-import com.example.eduvaultlms.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +41,20 @@ public class QuizService {
     private final CourseRepository     courseRepo;
     private final EnrollmentRepository enrollmentRepo;
     private final EmailService         emailService;
+    private final ProgressService      progressService;
 
     @Transactional
-    public QuizResponse createQuiz(QuizRequest request) {
+    public QuizResponse createQuiz(UUID courseId, QuizRequest request) {
 
-        Course course = courseRepo.findById(request.getCourseId())
+        Course course = courseRepo.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Course not found: " + request.getCourseId()));
+                        "Course not found: " + courseId));
+
+        if (quizRepo.existsByCourseIdAndTitleIgnoreCase(course.getId(), request.getTitle())) {
+            throw new DuplicateResourceException(
+                    "A quiz with the title '" + request.getTitle() +
+                            "' already exists for this course.");
+        }
 
         Quiz quiz = new Quiz();
         quiz.setCourse(course);
@@ -60,7 +69,7 @@ public class QuizService {
             q.setText(qr.getText());
             q.setOptions(qr.getOptions());
             q.setCorrectIndex(qr.getCorrectIndex());
-            q.setPoints(qr.getPoints());
+            q.setPoints(qr.getPoints() != null ? qr.getPoints() : 1);
             questions.add(q);
         }
         quiz.setQuestions(questions);
@@ -87,7 +96,11 @@ public class QuizService {
         User student = findUserOrThrow(username);
         guardEnrolled(student.getId(), quiz.getCourse().getId());
 
-        int totalScore = 0;
+        int totalPossiblePoints = quiz.getQuestions().stream()
+                .mapToInt(Question::getPoints)
+                .sum();
+
+        int earnedPoints = 0;
         for (AnswerRequest answer : request.getAnswers()) {
 
             Question question = quiz.getQuestions().stream()
@@ -97,17 +110,25 @@ public class QuizService {
                             "Question not found in this quiz: " + answer.getQuestionId()));
 
             if (answer.getSelectedIndex().equals(question.getCorrectIndex())) {
-                totalScore += question.getPoints();
+                earnedPoints += question.getPoints();
             }
         }
+
+        int finalScore = totalPossiblePoints > 0
+                ? BigDecimal.valueOf(earnedPoints)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(totalPossiblePoints), 10, RoundingMode.HALF_UP)
+                .setScale(0, RoundingMode.HALF_UP)
+                .intValue()
+                : 0;
 
         int attempt = quizResultRepo.countByStudentIdAndQuizId(student.getId(), quizId) + 1;
 
         QuizResult result = new QuizResult();
         result.setStudent(student);
         result.setQuiz(quiz);
-        result.setScore(totalScore);
-        result.setPassed(totalScore >= quiz.getPassMark());
+        result.setScore(finalScore);
+        result.setPassed(finalScore >= quiz.getPassMark());
         result.setAttemptNumber(attempt);
         result.setTakenAt(LocalDateTime.now());
 
@@ -120,6 +141,10 @@ public class QuizService {
                 saved.getScore(),
                 saved.isPassed()
         );
+
+        if (saved.isPassed()) {
+            progressService.updateEnrollmentCompletion(student, quiz.getCourse());
+        }
 
         return toQuizResultResponse(saved);
     }

@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Table(name = "quizResult")
 public class QuizResult {
 
     @Id

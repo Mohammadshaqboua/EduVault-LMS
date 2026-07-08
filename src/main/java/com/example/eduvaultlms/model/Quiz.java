@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Table(name = "quizzes")
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

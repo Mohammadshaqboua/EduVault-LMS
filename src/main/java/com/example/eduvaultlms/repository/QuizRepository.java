@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, UUID> {
     List<Quiz> findByCourseId(UUID courseId);
+    boolean existsByCourseIdAndTitleIgnoreCase(UUID courseId, String title);
 }

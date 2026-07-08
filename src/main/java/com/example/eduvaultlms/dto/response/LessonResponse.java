@@ -1,19 +1,23 @@
 package com.example.eduvaultlms.dto.response;
 
 import com.example.eduvaultlms.model.Lesson;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class LessonResponse {
-    private UUID    id;
-    private String  title;
-    private String  videoUrl;
-    private String  content;
+    private UUID id;
+    private String title;
+    private String videoUrl;
+    private String content;
     private Integer duration;
     private Integer orderIndex;
-    private UUID    courseId;
+    private UUID courseId;
 
     public LessonResponse(Lesson lesson) {
         this.id = lesson.getId();

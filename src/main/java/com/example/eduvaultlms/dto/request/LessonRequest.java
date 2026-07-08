@@ -1,11 +1,15 @@
 package com.example.eduvaultlms.dto.request;
 
+import com.itextpdf.styledxmlparser.jsoup.nodes.Document;
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LessonRequest {
     @NotBlank @Size(max = 200)
     private String title;
@@ -18,5 +22,4 @@ public class LessonRequest {
 
     @NotNull @Min(1)
     private Integer orderIndex;
-
 }

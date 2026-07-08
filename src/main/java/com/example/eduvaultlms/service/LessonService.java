@@ -52,27 +52,64 @@ public class LessonService {
 
     public LessonResponse updateLesson(UUID id, LessonRequest request, MultipartFile video) {
         Lesson lesson = lessonRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id: " + id));
-
-        if (video != null && !video.isEmpty()) {
-            String url = fileUploadService.uploadLessonVideo(video);
-            request.setVideoUrl(url);
-        }
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
         lesson.setTitle(request.getTitle());
-        lesson.setVideoUrl(request.getVideoUrl());
         lesson.setContent(request.getContent());
         lesson.setDuration(request.getDuration());
         lesson.setOrderIndex(request.getOrderIndex());
 
-        return new LessonResponse(lessonRepo.save(lesson));
+        if (video != null && !video.isEmpty()) {
+            String videoUrl = fileUploadService.uploadLessonVideo(video);
+            lesson.setVideoUrl(videoUrl);
+        }
+
+        Lesson updated = lessonRepo.save(lesson);
+
+        return LessonResponse.builder()
+                .id(updated.getId())
+                .title(updated.getTitle())
+                .content(updated.getContent())
+                .videoUrl(updated.getVideoUrl())
+                .duration(updated.getDuration())
+                .orderIndex(updated.getOrderIndex())
+                .courseId(updated.getCourse().getId())
+                .build();
     }
 
     public LessonResponse reorderLesson(UUID id, int newOrderIndex) {
         Lesson lesson = lessonRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found with id: " + id));
+
+        int oldOrderIndex = lesson.getOrderIndex();
+        UUID courseId = lesson.getCourse().getId();
+
+        if (newOrderIndex == oldOrderIndex) {
+            return new LessonResponse(lesson);
+        }
+
+        List<Lesson> lessonsInCourse = lessonRepo.findByCourseId(courseId);
+
+        if (newOrderIndex < oldOrderIndex) {
+            for (Lesson l : lessonsInCourse) {
+                if (!l.getId().equals(id) && l.getOrderIndex() >= newOrderIndex && l.getOrderIndex() < oldOrderIndex) {
+                    l.setOrderIndex(l.getOrderIndex() + 1);
+                    lessonRepo.save(l);
+                }
+            }
+        } else {
+            for (Lesson l : lessonsInCourse) {
+                if (!l.getId().equals(id) && l.getOrderIndex() > oldOrderIndex && l.getOrderIndex() <= newOrderIndex) {
+                    l.setOrderIndex(l.getOrderIndex() - 1);
+                    lessonRepo.save(l);
+                }
+            }
+        }
+
         lesson.setOrderIndex(newOrderIndex);
-        return new LessonResponse(lessonRepo.save(lesson));
+        Lesson updated = lessonRepo.save(lesson);
+
+        return new LessonResponse(updated);
     }
 
     public void deleteLesson(UUID id) {

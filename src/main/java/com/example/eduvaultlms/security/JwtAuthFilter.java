@@ -1,5 +1,6 @@
 package com.example.eduvaultlms.security;
 
+import com.example.eduvaultlms.model.User;
 import com.example.eduvaultlms.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +24,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
-
     @Autowired
     private ApplicationContext context;
 
@@ -31,19 +31,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         String authHeader = request.getHeader("Authorization");
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
                 String email = jwtService.extractEmail(token);
-
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = context.getBean(UserDetailsServiceImpl.class)
                             .loadUserByUsername(email);
 
-                    if (jwtService.isTokenValid(token, userDetails)) {
+                    if (jwtService.isTokenValid(token, userDetails) && isTokenNotRevoked(token, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails, null, userDetails.getAuthorities());
@@ -56,7 +53,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
             }
         }
-
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isTokenNotRevoked(String token, UserDetails userDetails) {
+        if (!(userDetails instanceof User user)) return true;
+        if (user.getTokenValidAfter() == null) return true;
+        return jwtService.getIssuedAt(token) >= user.getTokenValidAfter();
     }
 }

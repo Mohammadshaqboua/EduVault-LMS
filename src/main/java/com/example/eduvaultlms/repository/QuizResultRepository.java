@@ -15,4 +15,9 @@ public interface QuizResultRepository extends JpaRepository<QuizResult, UUID> {
     List<QuizResult> findByStudentIdAndQuizIdOrderByAttemptNumberAsc(UUID studentId, UUID quizId);
 
     List<QuizResult> findByQuizIdOrderByStudentIdAscAttemptNumberAsc(UUID quizId);
+
+    boolean existsByStudentIdAndQuizIdAndIsPassedTrue(UUID studentId, UUID quizId);
+
+    Optional<QuizResult> findTopByStudentIdAndQuizIdOrderByAttemptNumberDesc(
+            UUID studentId, UUID quizId);
 }

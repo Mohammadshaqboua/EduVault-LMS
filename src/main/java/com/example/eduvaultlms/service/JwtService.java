@@ -1,5 +1,6 @@
 package com.example.eduvaultlms.service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,45 +19,33 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.access-expiration}")
+    @Value("${jwt.access-token-expiration}")
     private long accessExpiration;
 
-    @Value("${jwt.refresh-expiration}")
+    @Value("${jwt.refresh-token-expiration}")
     private long refreshExpiration;
 
     public String generateAccessToken(String email) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
-                .claims()
-                .add(claims)
-                .subject(email)
+                .claims().add(claims).subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + accessExpiration))
-                .and()
-                .signWith(getKey())
-                .compact();
+                .and().signWith(getKey()).compact();
     }
 
     public String generateRefreshToken(String email) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
-                .claims()
-                .add(claims)
-                .subject(email)
+                .claims().add(claims).subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
-                .and()
-                .signWith(getKey())
-                .compact();
+                .and().signWith(getKey()).compact();
     }
 
     public String extractEmail(String token) {
-        return Jwts.parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return Jwts.parser().verifyWith(getKey()).build()
+                .parseSignedClaims(token).getPayload().getSubject();
     }
 
     public boolean isTokenValid(String token) {
@@ -77,12 +66,14 @@ public class JwtService {
     }
 
     public Date extractExpiration(String token) {
-        return Jwts.parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration();
+        return Jwts.parser().verifyWith(getKey()).build()
+                .parseSignedClaims(token).getPayload().getExpiration();
+    }
+
+    public long getIssuedAt(String token) {
+        Claims claims = Jwts.parser().verifyWith(getKey()).build()
+                .parseSignedClaims(token).getPayload();
+        return claims.getIssuedAt().getTime();
     }
 
     private SecretKey getKey() {

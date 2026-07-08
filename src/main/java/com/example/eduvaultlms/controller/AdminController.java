@@ -25,10 +25,16 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getStats());
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/students")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> getUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    public ResponseEntity<List<UserResponse>> getStudents() {
+        return ResponseEntity.ok(adminService.getAllStudents());
+    }
+
+    @GetMapping("/users/admins")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserResponse>> getAdmins() {
+        return ResponseEntity.ok(adminService.getAllAdmins());
     }
 
     @PatchMapping("/users/{id}/toggle")
@@ -40,7 +46,7 @@ public class AdminController {
 
     @GetMapping("/courses/stats")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CourseStatsResponse> getCourseStats() {
+    public ResponseEntity<List<CourseStatsResponse>> getCourseStats() {
         return ResponseEntity.ok(adminService.getCourseStats());
     }
 }

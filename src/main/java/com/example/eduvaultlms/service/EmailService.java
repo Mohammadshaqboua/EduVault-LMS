@@ -26,27 +26,73 @@ public class EmailService {
 
     @Async
     public void sendWelcomeEmail(String toEmail, String name) {
-        String subject = "Welcome to " + APP_NAME;
-
+        String subject = "🎉  Welcome to " + APP_NAME;
         String body = """
-            <div style="font-family: Arial, sans-serif; direction:ltr; text-align:left; color:#333; line-height:1.6;">
-                <h2 style="color:#2c3e50;">Welcome, %s 👋</h2>
-            
-                <p>We’re excited to have you on board at <b>%s</b>.</p>
-            
-                <p>Your account has been created successfully, and you’re now ready to explore our learning platform.</p>
-            
-                <p>Browse available courses, track your progress, and start your learning journey today.</p>
-            
-                <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
-            
-                <p style="font-size:14px; color:#777;">
-                    Thank you for joining us.<br>
-                    The <b>%s</b> Team
-                </p>
-            </div>
-            """.formatted(name, APP_NAME, APP_NAME);
+        <div style="margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;">
+            <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:30px 0;">
+                <tr>
+                    <td align="center">
+                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                            
+                            <!-- Header -->
+                            <tr>
+                                <td style="background-color:#2c3e50; padding:28px 40px; text-align:center;">
+                                    <h1 style="margin:0; color:#ffffff; font-size:22px; letter-spacing:0.5px;">%s</h1>
+                                </td>
+                            </tr>
 
+                            <!-- Body -->
+                            <tr>
+                                <td style="padding:36px 40px; color:#333333; line-height:1.7; text-align:left; direction:ltr;">
+                                    <h2 style="color:#2c3e50; margin-top:0; font-size:20px;">Welcome, %s 👋</h2>
+
+                                    <p style="font-size:15px; margin:16px 0;">
+                                        We're excited to have you on board at <b>%s</b>.
+                                    </p>
+
+                                    <p style="font-size:15px; margin:16px 0;">
+                                        Your account has been created successfully, and you're now ready to explore our learning platform.
+                                    </p>
+
+                                    <p style="font-size:15px; margin:16px 0;">
+                                        Browse available courses, track your progress, and start your learning journey today.
+                                    </p>
+
+                                    <!-- CTA Button -->
+                                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
+                                        <tr>
+                                            <td align="center" style="border-radius:6px; background-color:#2c3e50;">
+                                                <a href="#" style="display:inline-block; padding:12px 28px; color:#ffffff; text-decoration:none; font-size:15px; font-weight:bold; border-radius:6px;">
+                                                    Get Started
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <hr style="border:none; border-top:1px solid #eee; margin:24px 0;">
+
+                                    <p style="font-size:13px; color:#888888; margin:0;">
+                                        Thank you for joining us.<br>
+                                        The <b>%s</b> Team
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background-color:#f0f2f5; padding:18px 40px; text-align:center;">
+                                    <p style="font-size:12px; color:#999999; margin:0;">
+                                        © %s %s. All rights reserved.
+                                    </p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        """.formatted(APP_NAME, name, APP_NAME, APP_NAME, java.time.Year.now().getValue(), APP_NAME);
         send(toEmail, subject, body);
     }
 
@@ -54,88 +100,168 @@ public class EmailService {
     public void sendCertificateEmail(String toEmail, String studentName,
                                      String courseTitle, String certificateUrl) {
         String subject = "🎉 Congratulations! Your Certificate for " + courseTitle + " is Ready";
-
         String body = """
-            <div style="font-family: Arial, sans-serif; direction:ltr; text-align:left; color:#333; line-height:1.6;">
-                <h2 style="color:#2c3e50;">Congratulations, %s! 🎓</h2>
+        <div style="margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;">
+            <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:30px 0;">
+                <tr>
+                    <td align="center">
+                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
 
-                <p>You have successfully completed the course <b>%s</b> with <b>100%% progress</b>.</p>
+                            <!-- Header -->
+                            <tr>
+                                <td style="background-color:#2563eb; padding:32px 40px; text-align:center;">
+                                    <div style="font-size:40px; margin-bottom:8px;">🎓</div>
+                                    <h1 style="margin:0; color:#ffffff; font-size:22px;">Certificate Ready!</h1>
+                                </td>
+                            </tr>
 
-                <p>This is a significant achievement, and we’re proud to be part of your learning journey.</p>
+                            <!-- Body -->
+                            <tr>
+                                <td style="padding:36px 40px; color:#333333; line-height:1.7; text-align:left; direction:ltr;">
+                                    <h2 style="color:#2c3e50; margin-top:0; font-size:20px;">Congratulations, %s! 🎉</h2>
 
-                <p>Your certificate is now ready and can be downloaded using the button below:</p>
+                                    <p style="font-size:15px; margin:16px 0;">
+                                        You have successfully completed the course <b>%s</b> with <b>100%% progress</b>.
+                                    </p>
 
-                <div style="margin: 25px 0;">
-                    <a href="%s"
-                       style="
-                           background-color:#2563eb;
-                           color:white;
-                           padding:12px 24px;
-                           text-decoration:none;
-                           border-radius:8px;
-                           font-weight:bold;
-                           display:inline-block;">
-                        Download Certificate (PDF)
-                    </a>
-                </div>
+                                    <p style="font-size:15px; margin:16px 0;">
+                                        This is a significant achievement, and we're proud to be part of your learning journey.
+                                    </p>
 
-                <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+                                    <p style="font-size:15px; margin:16px 0;">
+                                        Your certificate is now ready and can be downloaded using the button below:
+                                    </p>
 
-                <p style="font-size:14px; color:#777;">
-                    Keep learning and keep growing.<br>
-                    The <b>%s</b> Team
-                </p>
-            </div>
-            """.formatted(studentName, courseTitle, certificateUrl, APP_NAME);
+                                    <!-- CTA Button -->
+                                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
+                                        <tr>
+                                            <td align="center" style="border-radius:8px; background-color:#2563eb;">
+                                                <a href="%s" style="display:inline-block; padding:14px 30px; color:#ffffff; text-decoration:none; font-size:15px; font-weight:bold; border-radius:8px;">
+                                                    📄 Download Certificate (PDF)
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
 
+                                    <hr style="border:none; border-top:1px solid #eee; margin:24px 0;">
+
+                                    <p style="font-size:13px; color:#888888; margin:0;">
+                                        Keep learning and keep growing.<br>
+                                        The <b>%s</b> Team
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background-color:#f0f2f5; padding:18px 40px; text-align:center;">
+                                    <p style="font-size:12px; color:#999999; margin:0;">
+                                        © %s %s. All rights reserved.
+                                    </p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        """.formatted(studentName, courseTitle, certificateUrl, APP_NAME,
+                java.time.Year.now().getValue(), APP_NAME);
         send(toEmail, subject, body);
     }
 
     @Async
     public void sendQuizResultEmail(String toEmail, String studentName,
                                     String quizTitle, int score, boolean isPassed) {
-
         String subject = isPassed
                 ? "✅ Congratulations! You Passed " + quizTitle
                 : "Quiz Result for " + quizTitle;
 
+        String headerColor = isPassed ? "#16a34a" : "#f59e0b";
+        String headerIcon = isPassed ? "🎉" : "📊";
+        String headerTitle = isPassed ? "Quiz Passed!" : "Quiz Result";
+
         String resultTitle = isPassed
                 ? "Congratulations, " + studentName + "! 🎉"
                 : "Hello, " + studentName;
-
         String resultMessage = isPassed
                 ? "You successfully passed the quiz. Great job!"
                 : "Unfortunately, you did not reach the passing score this time.";
-
         String extraMessage = isPassed
                 ? "Keep up the excellent work and continue your learning journey."
                 : "Review the course material and try again. Improvement comes with practice.";
+        String scoreBadgeColor = isPassed ? "#16a34a" : "#f59e0b";
 
         String body = """
-            <div style="font-family: Arial, sans-serif; direction:ltr; text-align:left; color:#333; line-height:1.6;">
-                <h2 style="color:#2c3e50;">%s</h2>
+        <div style="margin:0; padding:0; background-color:#f4f6f8; font-family: Arial, sans-serif;">
+            <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:30px 0;">
+                <tr>
+                    <td align="center">
+                        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
 
-                <p>%s</p>
+                            <!-- Header -->
+                            <tr>
+                                <td style="background-color:%s; padding:32px 40px; text-align:center;">
+                                    <div style="font-size:40px; margin-bottom:8px;">%s</div>
+                                    <h1 style="margin:0; color:#ffffff; font-size:22px;">%s</h1>
+                                </td>
+                            </tr>
 
-                <p>Your score in <b>%s</b>: <b>%d</b></p>
+                            <!-- Body -->
+                            <tr>
+                                <td style="padding:36px 40px; color:#333333; line-height:1.7; text-align:left; direction:ltr;">
+                                    <h2 style="color:#2c3e50; margin-top:0; font-size:20px;">%s</h2>
 
-                <p>%s</p>
+                                    <p style="font-size:15px; margin:16px 0;">%s</p>
 
-                <hr style="border:none; border-top:1px solid #ddd; margin:20px 0;">
+                                    <!-- Score Badge -->
+                                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+                                        <tr>
+                                            <td style="background-color:%s1a; border-left:4px solid %s; padding:14px 20px; border-radius:6px;">
+                                                <span style="font-size:14px; color:#555;">Quiz:</span> <b>%s</b><br>
+                                                <span style="font-size:14px; color:#555;">Score:</span> <b style="font-size:18px; color:%s;">%d / 100</b>
+                                            </td>
+                                        </tr>
+                                    </table>
 
-                <p style="font-size:14px; color:#777;">
-                    The <b>%s</b> Team
-                </p>
-            </div>
-            """.formatted(
+                                    <p style="font-size:15px; margin:16px 0;">%s</p>
+
+                                    <hr style="border:none; border-top:1px solid #eee; margin:24px 0;">
+
+                                    <p style="font-size:13px; color:#888888; margin:0;">
+                                        The <b>%s</b> Team
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background-color:#f0f2f5; padding:18px 40px; text-align:center;">
+                                    <p style="font-size:12px; color:#999999; margin:0;">
+                                        © %s %s. All rights reserved.
+                                    </p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        """.formatted(
+                headerColor,
+                headerIcon,
+                headerTitle,
                 resultTitle,
                 resultMessage,
+                scoreBadgeColor, scoreBadgeColor,
                 quizTitle,
-                score,
+                scoreBadgeColor, score,
                 extraMessage,
-                APP_NAME
+                APP_NAME,
+                java.time.Year.now().getValue(), APP_NAME
         );
-
         send(toEmail, subject, body);
     }
 

@@ -26,12 +26,13 @@ public class QuizController {
     @Autowired
     private QuizService quizService;
 
-    @PostMapping("/quizzes")
+    @PostMapping("/api/courses/{courseId}/quizzes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<QuizResponse> createQuiz(
-            @Valid @RequestBody QuizRequest request
-    ) {
-        QuizResponse created = quizService.createQuiz(request);
+            @PathVariable UUID courseId,
+            @Valid @RequestBody QuizRequest request) {
+
+        QuizResponse created = quizService.createQuiz(courseId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

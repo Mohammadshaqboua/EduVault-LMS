@@ -40,8 +40,10 @@ public class User implements UserDetails {
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // ===== UserDetails implementation =====
+    @Column(name = "token_valid_after")
+    private Long tokenValidAfter;
 
+    // ===== UserDetails implementation =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

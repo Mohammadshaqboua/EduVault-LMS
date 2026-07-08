@@ -16,6 +16,7 @@ public class LessonProgressResponse {
     private UUID            lessonId;
     private String          lessonTitle;
     private Boolean         isCompleted;
+    private Boolean         allQuizzesPassed;
     private LocalDateTime   watchedAt;
     private Integer         watchedSeconds;
 }

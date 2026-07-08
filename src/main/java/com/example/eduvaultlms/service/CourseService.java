@@ -10,6 +10,7 @@ import com.example.eduvaultlms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -62,14 +63,33 @@ public class CourseService {
         return new CourseResponse(saved);
     }
 
-    public CourseResponse updateCourse(UUID id, CourseRequest request) {
+    @Transactional
+    public CourseResponse updateCourse(UUID id, CourseRequest request, MultipartFile thumbnail) {
+
         Course course = courseRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
 
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
-        course.setThumbnailUrl(request.getThumbnailUrl());
         course.setPrice(request.getPrice());
+
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            String oldPublicId = course.getThumbnailPublicId();
+
+            FileUploadService.UploadResult result =
+                    fileUploadService.uploadCourseThumbnailWithId(thumbnail);
+
+            course.setThumbnailUrl(result.url());
+            course.setThumbnailPublicId(result.publicId());
+
+            Course updated = courseRepo.save(course);
+
+            if (oldPublicId != null && !oldPublicId.isBlank()) {
+                fileUploadService.deleteFile(oldPublicId, "image");
+            }
+
+            return new CourseResponse(updated);
+        }
 
         Course updated = courseRepo.save(course);
         return new CourseResponse(updated);

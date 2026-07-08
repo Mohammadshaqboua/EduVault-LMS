@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "courses")
+@Table(name = "Courses")
 public class Course {
 
     @Id
@@ -31,4 +31,7 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "createdBy", nullable = false)
     private User createdBy;
+
+    @Column(name = "thumbnail_public_id")
+    private String thumbnailPublicId;
 }
