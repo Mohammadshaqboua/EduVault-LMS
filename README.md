@@ -314,18 +314,17 @@ eduvault-lms/
 └── src/main/
     ├── resources/
     │   ├── application.yml
-    │   └── application-prod.yml
-    └── java/com/eduvault/lms/
-        ├── EduVaultApplication.java
+    │   └── application-local.yml
+    └── java/com/example/eduvaultlms/
+        ├── EduVaultLmsApplication.java
         │
         ├── config/                    # Spring configuration
-        │   ├── SecurityConfig.java
-        │   ├── JwtConfig.java
         │   ├── CloudinaryConfig.java
+        │   ├── JwtConfig.java
+        │   ├── SecurityConfig.java
         │   └── SwaggerConfig.java
         │
         ├── security/                  # JWT + Filters
-        │   ├── JwtTokenProvider.java
         │   ├── JwtAuthFilter.java
         │   └── UserDetailsServiceImpl.java
         │
@@ -358,18 +357,33 @@ eduvault-lms/
         │   ├── request/
         │   │   ├── RegisterRequest.java
         │   │   ├── LoginRequest.java
+        │   │   ├── RefreshTokenRequest.java
         │   │   ├── CourseRequest.java
         │   │   ├── LessonRequest.java
-        │   │   └── QuizSubmitRequest.java
+        │   │   ├── QuizRequest.java
+        │   │   ├── QuestionRequest.java
+        │   │   ├── AnswerRequest.java
+        │   │   ├── QuizSubmitRequest.java
+        │   │   └── ReorderRequest.java
         │   └── response/
         │       ├── AuthResponse.java
+        │       ├── UserResponse.java
         │       ├── CourseResponse.java
-        │       ├── ProgressResponse.java
+        │       ├── CourseStatsResponse.java
+        │       ├── CourseProgressResponse.java
+        │       ├── LessonResponse.java
+        │       ├── LessonProgressResponse.java
+        │       ├── EnrollmentResponse.java
+        │       ├── QuizResponse.java
+        │       ├── QuestionResponse.java
         │       ├── QuizResultResponse.java
-        │       └── AdminStatsResponse.java
+        │       ├── CertificateResponse.java
+        │       ├── AdminStatsResponse.java
+        │       └── MessageResponse.java
         │
         ├── service/                   # Business Logic
         │   ├── AuthService.java
+        │   ├── JwtService.java
         │   ├── CourseService.java
         │   ├── LessonService.java
         │   ├── EnrollmentService.java
@@ -394,6 +408,7 @@ eduvault-lms/
             ├── GlobalExceptionHandler.java
             ├── ResourceNotFoundException.java
             ├── UnauthorizedException.java
+            ├── DuplicateResourceException.java
             └── AlreadyEnrolledException.java
 ```
 
