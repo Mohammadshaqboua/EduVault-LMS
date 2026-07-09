@@ -2,7 +2,7 @@
 
 > A complete Learning Management System — REST API, No Front End
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6.x-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)]()
 [![MySQL](https://img.shields.io/badge/MySQL-PostgreSQL-4479A1?style=flat-square&logo=mysql&logoColor=white)]()
@@ -418,7 +418,7 @@ eduvault-lms/
 
 | Technology | Purpose | Details |
 |---|---|---|
-| **Spring Boot** | Core framework | v6.x / Java 21 |
+| **Spring Boot** | Core framework | v4.0.6 / Java 21 |
 | **Spring Security** | Auth & authorization | JWT + BCrypt |
 | **Spring Data JPA** | Database access | Hibernate ORM |
 | **MySQL** | Primary database | v8.x / or PostgreSQL |
@@ -520,6 +520,6 @@ See the [`LICENSE`](./LICENSE) file for full terms.
 
 <div align="center">
 
-**EduVault LMS** · Spring Boot 6 · Java 21 · REST API · Back End Only
+**EduVault LMS** · Spring Boot 4.0.6 · Java 21 · REST API · Back End Only
 
 </div>
