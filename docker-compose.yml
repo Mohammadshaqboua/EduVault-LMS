@@ -1,0 +1,51 @@
+services:
+  backend:
+    build: .
+    container_name: eduvault-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/eduvault
+      SPRING_DATASOURCE_USERNAME: eduvault_user
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-changeme}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - eduvault-network
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    container_name: eduvault-db
+    environment:
+      POSTGRES_DB: eduvault
+      POSTGRES_USER: eduvault_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eduvault_user -d eduvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eduvault-network
+    restart: unless-stopped
+volumes:
+  pgdata:
+    driver: local
+networks:
+  eduvault-network:
+    driver: bridge
