@@ -297,7 +297,8 @@ stateDiagram-v2
 | Method | Endpoint | Access |
 |---|---|---|
 | `GET` | `/api/admin/stats` | Admin |
-| `GET` | `/api/admin/users` | Admin |
+| `GET` | `/api/admin/users/admins` | Admin |
+| `GET` | `/api/admin/users/students` | Admin |
 | `PATCH` | `/api/admin/users/{id}/toggle` | Admin |
 | `GET` | `/api/admin/courses/stats` | Admin |
 
